@@ -55,18 +55,33 @@ public class SocialMediaController {
     }
 
     private void registerHandler(Context ctx) {
-        try {
-            Account account = ctx.bodyAsClass(Account.class);
-            Account createdAccount = socialMediaService.registerAccount(account);
+        Account account = ctx.bodyAsClass(Account.class);
+        Account createdAccount = socialMediaService.registerUser(account.getUsername(), account.getPassword());
+    
+        if (createdAccount != null) {
             createdAccount.setAccount_id(createdAccount.getAccount_id() + 1); // Set the account_id
             ctx.json(createdAccount).status(200);
-        } catch (AccountRegistrationException e) {
+        } else {
             ctx.status(400);
         }
     }
-    private void loginHandler (Context context) {
 
+    private void loginHandler(Context ctx) {
+
+        try {
+            Account account = ctx.bodyAsClass(Account.class);
+            boolean loggedIn = socialMediaService.loginUser(account.getUsername(), account.getPassword());
+
+            if (loggedIn) {
+                ctx.status(200);
+            } else {
+                ctx.status(401);
+            }
+        } catch (Exception e) {
+            ctx.status(400);
+        }
     }
+
     private void postMessagesHandler(Context context) {
 
     }
