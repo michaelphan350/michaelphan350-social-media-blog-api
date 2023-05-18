@@ -12,9 +12,14 @@ public class MessageService {
     }
 
     public Message createMessage (int accountId, String messageText, long timePostedEpoch) {
+        //Validation Check:
+        if (messageText.isBlank() || messageText.length() > 254) {
+            return null;
+        }
         Message message = new Message(accountId, messageText, timePostedEpoch);
         return messageDAO.createMessage(message);
     }
+
 
     public List<Message> getAllMessages() {
         return messageDAO.getAllMessages();
