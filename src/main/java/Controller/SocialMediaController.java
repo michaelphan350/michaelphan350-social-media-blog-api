@@ -117,7 +117,7 @@ public class SocialMediaController {
         if(message.isPresent()) {
             ctx.json(message.get()).status(200);
         } else { 
-            ctx.status(404);
+            ctx.status(200);
         }
 
     }
