@@ -121,19 +121,17 @@ public class SocialMediaController {
         }
 
     }
-    private void deleteMessagesByIdHandler (Context ctx) {
-        int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
+private void deleteMessagesByIdHandler(Context ctx) {
+    int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
 
-        boolean deleted = messageService.deleteMessageById(messageId);
+    Optional<Message> deletedMessage = messageService.deleteMessageById(messageId);
 
-        if(deleted) {
-            ctx.status(200);
-        } else { 
-            ctx.status(404);
-        }
-
-
+    if (deletedMessage.isPresent()) {
+        ctx.json(deletedMessage.get()).status(200);
+    } else {
+        ctx.status(200).result(""); // Empty response body
     }
+}
     private void updateMessagesByIdHandler (Context ctx) {
 
         int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
