@@ -97,7 +97,7 @@ public class SocialMediaController {
         String messageText = message.getMessage_text();
         Long timePostedEpoch = message.getTime_posted_epoch();
 
-        Message createdMessage = messageService.createMessage(accountId, messageText,timePostedEpoch);
+        Message createdMessage = messageService.createMessage(accountId, messageText, timePostedEpoch);
 
         if (createdMessage != null) {
             ctx.json(createdMessage).status(200);
@@ -107,13 +107,7 @@ public class SocialMediaController {
     }
     private void getAllMessagesHandler (Context ctx) {
         List<Message> messages = messageService.getAllMessages();
-
-        if(!messages.isEmpty()) {
-            ctx.json(messages).status(200);
-        }  else {
-            ctx.status(404);
-        }
-
+        ctx.json(messages).status(200);
     }
     private void getMessageByIdHandler (Context ctx) {
         int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
