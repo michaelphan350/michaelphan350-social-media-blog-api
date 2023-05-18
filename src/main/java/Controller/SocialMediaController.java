@@ -11,7 +11,9 @@ import Service.SocialMediaService;
 import Model.Account;
 import Service.AccountRegistrationException;
 import DAO.AccountDAO;
-
+import Service.MessageService;
+import Model.Message;
+import DAO.MessageDAO;
 /**
  * TODO: You will need to write your own endpoints and handlers for your controller. The endpoints you will need can be
  * found in readme.md as well as the test cases. You should
@@ -20,10 +22,14 @@ import DAO.AccountDAO;
 public class SocialMediaController {
 
     private final SocialMediaService socialMediaService;
+    private final MessageService messageService;
 
     public SocialMediaController() {
         AccountDAO accountDAO = new AccountDAO();
         this.socialMediaService = new SocialMediaService(accountDAO);
+
+        MessageDAO messageDAO = new MessageDAO();
+        this.messageService = new MessageService(messageDAO);
     }
 
     /**
@@ -56,6 +62,7 @@ public class SocialMediaController {
 
     private void registerHandler(Context ctx) {
         Account account = ctx.bodyAsClass(Account.class);
+
         Account createdAccount = socialMediaService.registerUser(account.getUsername(), account.getPassword());
     
         if (createdAccount != null) {
@@ -70,6 +77,7 @@ public class SocialMediaController {
 
         try {
             Account account = ctx.bodyAsClass(Account.class);
+
             boolean loggedIn = socialMediaService.loginUser(account.getUsername(), account.getPassword());
 
             if (loggedIn) {
@@ -82,23 +90,79 @@ public class SocialMediaController {
         }
     }
 
-    private void postMessagesHandler(Context context) {
+    private void postMessagesHandler(Context ctx) {
+        Message message = ctx.bodyAsClass(Message.class);
+
+        int accountId = message.getPosted_by();
+        String messageText = message.getMessage_text();
+        Long timePostedEpoch = message.getTime_posted_epoch();
+
+        Message createdMessage = messageService.createMessage(accountId, messageText,timePostedEpoch);
+
+        if (createdMessage != null) {
+            ctx.json(createdMessage).status(200);
+        } else {
+            ctx.status(400);
+        }
+    }
+    private void getAllMessagesHandler (Context ctx) {
+        List<Message> messages = messageService.getAllMessages();
+
+        if(!messages.isEmpty()) {
+            ctx.json(messages).status(200);
+        }  else {
+            ctx.status(404);
+        }
 
     }
-    private void getAllMessagesHandler (Context context) {
+    private void getMessageByIdHandler (Context ctx) {
+        int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
+
+        Optional<Message> message = messageService.getMessageById(messageId);
+
+        if(message.isPresent()) {
+            ctx.json(message.get()).status(200);
+        } else { 
+            ctx.status(404);
+        }
 
     }
-    private void getMessageByIdHandler (Context context) {
+    private void deleteMessagesByIdHandler (Context ctx) {
+        int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
+
+        boolean deleted = messageService.deleteMessageById(messageId);
+
+        if(deleted) {
+            ctx.status(200);
+        } else { 
+            ctx.status(404);
+        }
+
 
     }
-    private void deleteMessagesByIdHandler (Context context) {
+    private void updateMessagesByIdHandler (Context ctx) {
 
+        int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
+        String messageText = ctx.body();
+
+        Optional<Message> updatedMessage = messageService.updateMessageById(messageId, messageText);
+
+        if(updatedMessage.isPresent()) {
+            ctx.json(updatedMessage.get()).status(200);
+        } else { 
+            ctx.status(404);
+        }
     }
-    private void updateMessagesByIdHandler (Context context) {
+    private void getMessagesByAccountIdHandler (Context ctx) {
+        int accountId = ctx.pathParamAsClass("account_id", Integer.class).get();
 
-    }
-    private void getMessagesByAccountIdHandler (Context context) {
+        List<Message> messages = messageService.getMessagesByAccountId(accountId);
 
+        if (!messages.isEmpty()) {
+            ctx.json(messages).status(200);
+        } else {
+            ctx.status(404);
+        }
     }
 
 }
