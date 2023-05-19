@@ -46,9 +46,15 @@ public class MessageService {
 
     public Optional<Message> updateMessageById(int messageId, String messageText) {
         // Validation Check
-        if (messageText.isEmpty() || messageText.length() > 255 || messageText == ""){
+        if (messageText.isEmpty() || messageText.length() > 254 || messageText.isBlank()){
             return Optional.empty();
         }
+        if (messageText.length()> 1000) {
+            System.out.println("Message length exceeds 1000 characters.");
+            return Optional.empty();
+        }
+        System.out.println("Updating message with ID: " + messageId);
+        System.out.println("New message text: " + messageText);
         return messageDAO.updateMessageById(messageId, messageText);
     }
 

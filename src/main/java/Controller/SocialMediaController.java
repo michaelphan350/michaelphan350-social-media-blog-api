@@ -1,5 +1,6 @@
 package Controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
@@ -7,6 +8,9 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import java.util.List;
 import java.util.Optional;
+
+import org.h2.util.json.JSONObject;
+
 import Service.SocialMediaService;
 import Model.Account;
 import Service.AccountRegistrationException;
@@ -132,24 +136,39 @@ private void deleteMessagesByIdHandler(Context ctx) {
         ctx.status(200).result(""); // Empty response body
     }
 }
-    private void updateMessagesByIdHandler (Context ctx) {
+private void updateMessagesByIdHandler(Context ctx) {
+    int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
+    String requestBody = ctx.body();
+    System.out.println("Received request body: " + requestBody);
 
-        int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
-        String messageText = ctx.body();
 
-        if(messageText.isEmpty()) {
-            ctx.status(400);
-            return;
-        }
+    String messageText = extractMessageText(requestBody);
+    System.out.println("Extracted message text: " + messageText);
 
-        Optional<Message> updatedMessage = messageService.updateMessageById(messageId, messageText);
-
-        if(updatedMessage.isPresent()) {
-            ctx.json(updatedMessage.get()).status(200);
-        } else { 
-            ctx.status(400);
-        }
+    if (messageText.isEmpty() || messageText.length()> 255) {
+        ctx.status(400); // Set status code to 400 when message text is empty
+        return;
     }
+
+    Optional<Message> updatedMessage = messageService.updateMessageById(messageId, messageText);
+
+    if (updatedMessage.isPresent()) {
+        ctx.json(updatedMessage.get()).status(200);
+    } else {
+        ctx.status(400);
+    }
+}
+
+private String extractMessageText(String requestBody) {
+    try {
+        ObjectMapper objectMapper = new ObjectMapper();
+        JsonNode jsonNode = objectMapper.readTree(requestBody);
+        return jsonNode.get("message_text").asText();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return "";
+    }
+}
     private void getMessagesByAccountIdHandler (Context ctx) {
         int accountId = ctx.pathParamAsClass("account_id", Integer.class).get();
 
