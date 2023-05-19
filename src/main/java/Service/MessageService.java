@@ -45,6 +45,10 @@ public class MessageService {
     }
 
     public Optional<Message> updateMessageById(int messageId, String messageText) {
+        // Validation Check
+        if (messageText.isEmpty() || messageText.length() > 255){
+            return Optional.empty();
+        }
         return messageDAO.updateMessageById(messageId, messageText);
     }
 

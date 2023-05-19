@@ -95,6 +95,10 @@ public class MessageDAO {
     }
 
     public Optional<Message> updateMessageById(int messageId, String messageText) {
+        // Validation Check
+        if (messageText.isEmpty() || messageText.length() > 255){
+            return Optional.empty();
+        }
         String sql = "UPDATE message SET message_text = ? WHERE message_id = ?";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, messageText);

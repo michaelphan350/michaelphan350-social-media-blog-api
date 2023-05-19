@@ -137,12 +137,17 @@ private void deleteMessagesByIdHandler(Context ctx) {
         int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
         String messageText = ctx.body();
 
+        if(messageText.isEmpty()) {
+            ctx.status(400);
+            return;
+        }
+
         Optional<Message> updatedMessage = messageService.updateMessageById(messageId, messageText);
 
         if(updatedMessage.isPresent()) {
             ctx.json(updatedMessage.get()).status(200);
         } else { 
-            ctx.status(404);
+            ctx.status(400);
         }
     }
     private void getMessagesByAccountIdHandler (Context ctx) {
