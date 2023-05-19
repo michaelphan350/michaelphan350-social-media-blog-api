@@ -155,10 +155,10 @@ private void deleteMessagesByIdHandler(Context ctx) {
 
         List<Message> messages = messageService.getMessagesByAccountId(accountId);
 
-        if (!messages.isEmpty()) {
+        if (!messages.isEmpty() || messages.isEmpty()) {
             ctx.json(messages).status(200);
         } else {
-            ctx.status(404);
+            ctx.status(400);
         }
     }
 
