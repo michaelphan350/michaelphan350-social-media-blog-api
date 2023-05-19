@@ -139,11 +139,9 @@ private void deleteMessagesByIdHandler(Context ctx) {
 private void updateMessagesByIdHandler(Context ctx) {
     int messageId = ctx.pathParamAsClass("message_id", Integer.class).get();
     String requestBody = ctx.body();
-    System.out.println("Received request body: " + requestBody);
 
 
     String messageText = extractMessageText(requestBody);
-    System.out.println("Extracted message text: " + messageText);
 
     if (messageText.isEmpty() || messageText.length()> 255) {
         ctx.status(400); // Set status code to 400 when message text is empty

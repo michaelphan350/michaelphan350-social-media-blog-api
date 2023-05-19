@@ -97,11 +97,9 @@ public class MessageDAO {
     public Optional<Message> updateMessageById(int messageId, String messageText) {
         // Validation Check
         if (messageText.isEmpty() || messageText.length() > 254 || messageText.isBlank()) {
-            System.out.println("Empty message text!"); // Add debug statement
             return Optional.empty();
         }
         if (messageText.length()> 1000) {
-            System.out.println("Message length exceeds 1000 characters.");
             return Optional.empty();
         }
         String sql = "UPDATE message SET message_text = ? WHERE message_id = ?";

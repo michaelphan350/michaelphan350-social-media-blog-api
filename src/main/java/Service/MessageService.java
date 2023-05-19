@@ -50,11 +50,8 @@ public class MessageService {
             return Optional.empty();
         }
         if (messageText.length()> 1000) {
-            System.out.println("Message length exceeds 1000 characters.");
             return Optional.empty();
         }
-        System.out.println("Updating message with ID: " + messageId);
-        System.out.println("New message text: " + messageText);
         return messageDAO.updateMessageById(messageId, messageText);
     }
 
